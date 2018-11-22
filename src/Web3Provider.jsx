@@ -102,7 +102,7 @@ class Web3Provider extends React.Component {
     const ethAccounts = this.getAccounts();
 
     if (isEmpty(ethAccounts)) {
-      web3 && web3.currentProvider && web3.currentProvider.enable()
+      web3 && web3.currentProvider && Promise.resolve(ethAccounts) // web3.currentProvider.getAccounts()
       .then(accounts => this.handleAccounts(accounts))
       .catch((err) => {
         this.setState({
@@ -121,12 +121,12 @@ class Web3Provider extends React.Component {
     let curr = this.state.accounts[0];
     next = next && next.toLowerCase();
     curr = curr && curr.toLowerCase();
-    const didChange = curr && next && (curr !== next);
+    const didChange = (curr !== next);
 
     if (isEmpty(this.state.accounts) && !isEmpty(accounts)) {
       this.setState({
         accountsError: null,
-        accounts: accounts
+        accounts
       });
     }
 
@@ -157,7 +157,7 @@ class Web3Provider extends React.Component {
           type: 'web3/RECEIVE_ACCOUNT',
           address: next
         });
-      } else if (didChange) {
+      } else if (didChange && curr && next) {
         store.dispatch({
           type: 'web3/CHANGE_ACCOUNT',
           address: next
@@ -186,7 +186,7 @@ class Web3Provider extends React.Component {
           if (netId != this.state.networkId) {
             this.setState({
               networkError: null,
-              networkId: netId
+              networkId: Number(netId)
             })
           }
         }
@@ -251,15 +251,15 @@ module.exports = Web3Provider;
 ============================================================================= */
 function getNetwork(networkId) {
   switch (networkId) {
-    case '1':
+    case 1:
       return 'MAINNET';
-    case '2':
+    case 2:
       return 'MORDEN';
-    case '3':
+    case 3:
       return 'ROPSTEN';
-    case '4':
+    case 4:
       return 'RINKEBY';
-    case '42':
+    case 42:
       return 'KOVAN';
     default:
       return 'UNKNOWN';
